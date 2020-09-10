@@ -1,10 +1,11 @@
 import { Router } from "express";
+import { getCustomRepository } from "typeorm";
 
 import ensureAthenticated from "../middlewares/ensureAuthenticated";
 
 import CreateBudgetService from "../services/Budget/CreateBudgetService";
-import ListBudgetService from "../services/Budget/ListBudgetService";
-import GetBudgetService from "../services/Budget/GetBudgetService";
+
+import BudgetRepository from "../repositories/BudgetRepository";
 
 const BudgetsRouter = Router();
 
@@ -34,9 +35,9 @@ BudgetsRouter.post("/", async (request, response) => {
 });
 
 BudgetsRouter.get("/", async (request, response) => {
-    const listBudget = new ListBudgetService();
+    const budgetRepository = getCustomRepository(BudgetRepository);
 
-    const budgets = await listBudget.execute({ user_id: request.user.id });
+    const budgets = await budgetRepository.list({ user_id: request.user.id });
 
     return response.json(budgets);
 });
@@ -44,12 +45,9 @@ BudgetsRouter.get("/", async (request, response) => {
 BudgetsRouter.get("/:budget_id", async (request, response) => {
     const { budget_id } = request.params;
 
-    const getBudget = new GetBudgetService();
+    const budgetRepository = getCustomRepository(BudgetRepository);
 
-    const budget = await getBudget.execute({
-        user_id: request.user.id,
-        budget_id,
-    });
+    const budget = await budgetRepository.show({ budget_id });
 
     return response.json(budget);
 });
