@@ -2,6 +2,8 @@ import { getRepository } from "typeorm";
 
 import Budget from "../../models/Budget";
 
+import handleCalculatePrice from "../../utils/CalculateBudgetPrice";
+
 interface Request {
     user_id: string;
     dev_amount: number;
@@ -9,6 +11,11 @@ interface Request {
     sm_amount: number;
     po_amount: number;
     days_amount: number;
+}
+
+interface BudgetResponse {
+    budget: Budget;
+    total: number;
 }
 
 class CreateBudgetService {
@@ -19,21 +26,25 @@ class CreateBudgetService {
         sm_amount,
         po_amount,
         days_amount,
-    }: Request): Promise<Budget> {
+    }: Request): Promise<BudgetResponse> {
         const budgetsRepository = getRepository(Budget);
 
-        const budget = budgetsRepository.create({
+        const budget = {
+            user_id,
             dev_amount,
             designer_amount,
             sm_amount,
             po_amount,
             days_amount,
-            user_id,
-        });
+        };
+
+        await budgetsRepository.create(budget);
 
         await budgetsRepository.save(budget);
 
-        return budget;
+        const total = handleCalculatePrice(budget);
+
+        return { ...budget, total };
     }
 }
 

@@ -56,6 +56,12 @@ export class CreateBudgets1599707932175 implements MigrationInterface {
                         default: 0,
                     },
                     {
+                        name: "total_price",
+                        type: "int",
+                        isNullable: false,
+                        default: 0,
+                    },
+                    {
                         name: "created_at",
                         type: "timestamp",
                         default: "now()",
