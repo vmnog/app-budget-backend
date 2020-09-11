@@ -23,6 +23,8 @@ $ cd app-budget-backend
 
 $ yarn install
 
+$ yarn typeorm migration:run
+
 $ yarn dev:server
 ```
 
