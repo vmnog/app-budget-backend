@@ -1,4 +1,4 @@
-import { getRepository } from "typeorm";
+import { getRepository, getConnection } from "typeorm";
 
 import Budget from "../../models/Budget";
 
@@ -13,10 +13,7 @@ interface Request {
     days_amount: number;
 }
 
-interface BudgetResponse {
-    budget: Budget;
-    total: number;
-}
+interface BudgetResponse {}
 
 class CreateBudgetService {
     async execute({
@@ -40,11 +37,19 @@ class CreateBudgetService {
 
         await budgetsRepository.create(budget);
 
-        await budgetsRepository.save(budget);
+        const { id } = await budgetsRepository.save(budget);
 
-        const total = handleCalculatePrice(budget);
+        const total_price = handleCalculatePrice(budget);
 
-        return { ...budget, total };
+        // Includes total price calculated
+        await getConnection()
+            .createQueryBuilder()
+            .update(Budget)
+            .set({ total_price })
+            .where("id = :id", { id })
+            .execute();
+
+        return { ...budget, total_price };
     }
 }
 

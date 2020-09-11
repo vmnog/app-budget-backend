@@ -37,6 +37,9 @@ class Budget {
     @Column("integer")
     days_amount: number;
 
+    @Column("integer")
+    total_price: number;
+
     @CreateDateColumn()
     created_at: Date;
 
